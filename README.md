@@ -2,3 +2,4 @@
 
 Open/Close vehicle inventory.
 Put/Get items.
++Gestion du poid
