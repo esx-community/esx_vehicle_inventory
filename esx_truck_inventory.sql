@@ -1,7 +1,6 @@
 CREATE TABLE IF NOT EXISTS `truck_inventory` (
 `id` int(11) NOT NULL,
   `item` varchar(100) NOT NULL,
-  `label` varchar(255) NOT NULL,
   `count` int(11) NOT NULL,
   `plate` varchar(8) NOT NULL,
   `name` varchar(255) NOT NULL
