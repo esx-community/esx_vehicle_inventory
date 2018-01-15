@@ -60,6 +60,24 @@ function VehicleInFront()
     return result
 end
 
+function VehicleMaxSpeed(vehicle,weight,maxweight)
+  local percent = (weight/maxweight)*100
+  local hashk= GetEntityModel(vehicle)
+  print('poid '..weight)
+ print('max '..maxweight)
+ print('perc'..percent)
+  if percent > 80  then
+    print('slow')
+    SetEntityMaxSpeed(vehFront,GetVehicleModelMaxSpeed(hashk)/1.4)
+  elseif percent > 50 then
+    print('medium')
+    SetEntityMaxSpeed(vehFront,GetVehicleModelMaxSpeed(hashk)/1.2)
+  else
+    print('full')
+    SetEntityMaxSpeed(vehFront,GetVehicleModelMaxSpeed(hashk))
+  end
+end
+
 -- Key controls
 Citizen.CreateThread(function()
   while true do
@@ -70,21 +88,23 @@ Citizen.CreateThread(function()
         local vehFront = VehicleInFront()
 	    local x,y,z = table.unpack(GetEntityCoords(GetPlayerPed(-1),true))
 	    local closecar = GetClosestVehicle(x, y, z, 4.0, 0, 71)
-          if vehFront > 0 and closecar ~= nil and GetPedInVehicleSeat(closecar, -1) ~= GetPlayerPed(-1) then
+      if vehFront > 0 and closecar ~= nil and GetPedInVehicleSeat(closecar, -1) ~= GetPlayerPed(-1) then
           	lastVehicle = vehFront
-    		local model = GetDisplayNameFromVehicleModel(GetEntityModel(closecar))
-      		local locked = GetVehicleDoorLockStatus(closecar)
+        		local model = GetDisplayNameFromVehicleModel(GetEntityModel(closecar))
+          	local locked = GetVehicleDoorLockStatus(closecar)
+            local class = GetVehicleClass(vehFront)
+            print(locked)
 	          ESX.UI.Menu.CloseAll()
             if ESX.UI.Menu.IsOpen('default', GetCurrentResourceName(), 'inventory') then
               SetVehicleDoorShut(vehFront, 5, false)
             else
-              if locked == 1 then
+              if locked == 1 or class == 15 or class == 16 or class == 14 then
 	              SetVehicleDoorOpen(vehFront, 5, false, false)
 	              ESX.UI.Menu.CloseAll()
 
 	              TriggerServerEvent("esx_truck_inventory:getInventory", GetVehicleNumberPlateText(vehFront))
-	          else
-	          	ESX.ShowNotification('Ce coffre est ~r~fermé')
+	            else
+	          	   ESX.ShowNotification('Ce coffre est ~r~fermé')
               end
             end
         else
@@ -169,19 +189,15 @@ AddEventHandler('esx_truck_inventory:getInventoryLoaded', function(inventory,wei
             local Itemweight =tonumber(getItemyWeight(data3.current.value)) * quantity
             local totalweight = tonumber(weight) + Itemweight
             vehFront = VehicleInFront()
-            print(data3.current.value)
-            print('quantity: '..quantity)
-            print('poid item: '..getItemyWeight(data3.current.value))
-            print('total: '..totalweight)
-            print('weight: '..weight)
+
             local typeVeh = GetVehicleClass(vehFront)
-            print('vehtype: '..typeVeh)
-            print('limit: '..Config.VehicleLimit[typeVeh])
+
             if totalweight > Config.VehicleLimit[typeVeh] then
               max = true
             else
               max = false
             end
+
 
 
             --test
@@ -207,6 +223,7 @@ AddEventHandler('esx_truck_inventory:getInventoryLoaded', function(inventory,wei
               max = false
             end
 ]]
+            ownedV = 0
             while vehiclePlate == '' do
               Wait(1000)
             end
@@ -228,8 +245,9 @@ AddEventHandler('esx_truck_inventory:getInventoryLoaded', function(inventory,wei
               	local x,y,z = table.unpack(GetEntityCoords(GetPlayerPed(-1),true))
   				    	local closecar = GetClosestVehicle(x, y, z, 4.0, 0, 71)
 
+              --  VehicleMaxSpeed(closecar,totalweight,Config.VehicleLimit[GetVehicleClass(closecar)])
 
-  				      TriggerServerEvent('esx_truck_inventory:addInventoryItem', GetVehicleClass(closecar), GetDisplayNameFromVehicleModel(GetEntityModel(closecar)), GetVehicleNumberPlateText(vehFront), data3.current.value, quantity, data3.current.name,data3.current.label,ownedV)
+  				      TriggerServerEvent('esx_truck_inventory:addInventoryItem', GetVehicleClass(closecar), GetDisplayNameFromVehicleModel(GetEntityModel(closecar)), GetVehicleNumberPlateText(vehFront), data3.current.value, quantity, data3.current.name,ownedV)
                 ESX.ShowNotification('Poid du coffre : ~g~'.. Kgweight .. ' Kg / '..MaxVh..' Kg')
               else
                 ESX.ShowNotification('Vous avez atteint la limite des ~r~ '..MaxVh..' Kg')
@@ -240,12 +258,7 @@ AddEventHandler('esx_truck_inventory:getInventoryLoaded', function(inventory,wei
 
 				    ESX.UI.Menu.CloseAll()
 
-		        --	local vehFront = VehicleInFront()
-		          --	if vehFront > 0 then
-		            --  TriggerServerEvent("esx_truck_inventory:getInventory", GetVehicleNumberPlateText(vehFront))
-		           -- else
-		             -- SetVehicleDoorShut(vehFrontBack, 5, false)
-		           -- end
+
 				  end,
 				  function(data4, menu4)
 		            SetVehicleDoorShut(vehFrontBack, 5, false)
@@ -264,8 +277,13 @@ AddEventHandler('esx_truck_inventory:getInventoryLoaded', function(inventory,wei
 			    local quantity = tonumber(data2.value)
           PlayerData = ESX.GetPlayerData()
 			    vehFront = VehicleInFront()
-          
+
           --test
+          local Itemweight =tonumber(getItemyWeight(data.current.value)) * quantity
+          local poid = weight - Itemweight
+
+
+
           for i=1, #PlayerData.inventory, 1 do
 
             if PlayerData.inventory[i].name == data.current.value then
@@ -282,7 +300,9 @@ AddEventHandler('esx_truck_inventory:getInventoryLoaded', function(inventory,wei
 
 			    if quantity > 0 and quantity <= tonumber(data.current.count) and vehFront > 0 then
             if not max then
+              --  VehicleMaxSpeed(vehFront,poid,Config.VehicleLimit[GetVehicleClass(vehFront)])
                TriggerServerEvent('esx_truck_inventory:removeInventoryItem', GetVehicleNumberPlateText(vehFront), data.current.value, quantity)
+
             else
               ESX.ShowNotification('~r~ Tu en porte trops')
             end

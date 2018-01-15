@@ -11,18 +11,19 @@ AddEventHandler('esx_truck_inventory:getOwnedVehicule', function()
   local _source = source
   local xPlayer = ESX.GetPlayerFromId(_source)
   MySQL.Async.fetchAll(
-    'SELECT * FROM `owned_vehicles` WHERE `owner` = @owner',
-    {
-      ['@owner'] = xPlayer.identifier
-    },
+      'SELECT * FROM owned_vehicles WHERE owner = @owner',
+   		{
+   			['@owner'] = xPlayer.identifier
+   		},
     function(result)
       if result ~= nil and #result > 0 then
           for _,v in pairs(result) do
       			local vehicle = json.decode(v.vehicle)
+            --print(vehicle.plate)
       			table.insert(vehicules, {plate = vehicle.plate})
       		end
       end
-    TriggerClientEvent('esx_truck_inventory:setOwnedVehicule', source, vehicules)
+    TriggerClientEvent('esx_truck_inventory:setOwnedVehicule', _source, vehicules)
     end)
 end)
 
@@ -61,8 +62,8 @@ AddEventHandler('esx_truck_inventory:getInventory', function(plate)
       if inventory ~= nil and #inventory > 0 then
         for i=1, #inventory, 1 do
           table.insert(inventory_, {
-            name      = inventory[i].item,
             label      = inventory[i].name,
+            name      = inventory[i].item,
             count     = inventory[i].count
           })
         end
@@ -94,16 +95,15 @@ end)
 
 
 RegisterServerEvent('esx_truck_inventory:addInventoryItem')
-AddEventHandler('esx_truck_inventory:addInventoryItem', function(type, model, plate, item, count, name,label,ownedV)
+AddEventHandler('esx_truck_inventory:addInventoryItem', function(type, model, plate, item, count, name,ownedV)
   local _source = source
   MySQL.Async.fetchAll(
-    'INSERT INTO truck_inventory (item,count,plate,name,label,owned) VALUES (@item,@qty,@plate,@name,@label,@owned) ON DUPLICATE KEY UPDATE count=count+ @qty',
+    'INSERT INTO truck_inventory (item,count,plate,name,owned) VALUES (@item,@qty,@plate,@name,@owned) ON DUPLICATE KEY UPDATE count=count+ @qty',
     {
       ['@plate'] = plate,
       ['@qty'] = count,
       ['@item'] = item,
       ['@name'] = name,
-      ['@label'] = label,
       ['@owned'] = ownedV,
     },
     function(result)
