@@ -3,7 +3,9 @@ CREATE TABLE IF NOT EXISTS `truck_inventory` (
   `item` varchar(100) NOT NULL,
   `count` int(11) NOT NULL,
   `plate` varchar(8) NOT NULL,
-  `name` varchar(255) NOT NULL
+  `name` varchar(255) NOT NULL,
+  `itemt` varchar(100) NOT NULL,
+  `owned` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 ALTER TABLE `truck_inventory`
