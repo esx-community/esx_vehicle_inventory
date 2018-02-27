@@ -101,7 +101,7 @@ end)
 RegisterServerEvent('esx_truck_inventory:addInventoryItem')
 AddEventHandler('esx_truck_inventory:addInventoryItem', function(type, model, plate, item, count, name, itemType, ownedV)
 
-  local XPlayer = ESX.GetPlayerFromId(source)
+  local xPlayer = ESX.GetPlayerFromId(source)
   MySQL.Async.fetchAll(
     'INSERT INTO truck_inventory (item,count,plate,name,owned) VALUES (@item,@qty,@plate,@name,@owned) ON DUPLICATE KEY UPDATE count=count+ @qty',
     {
