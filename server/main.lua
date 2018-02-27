@@ -71,34 +71,35 @@ AddEventHandler('esx_truck_inventory:getInventory', function(plate)
 end)
 
 RegisterServerEvent('esx_truck_inventory:removeInventoryItem')
-AddEventHandler('esx_truck_inventory:removeInventoryItem', function(plate, item, count)
+AddEventHandler('esx_truck_inventory:removeInventoryItem', function(plate, item, itemType, count)
   local _source = source
   MySQL.Async.fetchAll(
     'UPDATE `truck_inventory` SET `count`= `count` - @qty WHERE `plate` = @plate AND `item`= @item',
     {
       ['@plate'] = plate,
       ['@qty'] = count,
-      ['@item'] = itemname
+      ['@item'] = item,
+      ['@itemt'] = itemType		
     },
     function(result)
       if itemType == 'item_standard' then
       local xPlayer  = ESX.GetPlayerFromId(_source)
       if xPlayer ~= nil then
-      xPlayer.addInventoryItem(itemName, amount)
+      xPlayer.addInventoryItem(item, amount)
       end 
       
       if itemType == 'item_account' then
-      xPlayer.addAccountMoney(itemName, amount)
+      xPlayer.addAccountMoney(item, amount)
       end
 
      if itemType == 'item_weapon' then
-     xPlayer.addWeapon(itemName)
+     xPlayer.addWeapon(item)
      end
     end)
 end)
 
 RegisterServerEvent('esx_truck_inventory:addInventoryItem')
-AddEventHandler('esx_truck_inventory:addInventoryItem', function(type, model, plate, itemname, count, name,ownedV)
+AddEventHandler('esx_truck_inventory:addInventoryItem', function(type, model, plate, item, count, name, itemType, ownedV)
 
   local XPlayer = ESX.GetPlayerFromId(source)
   MySQL.Async.fetchAll(
@@ -106,27 +107,28 @@ AddEventHandler('esx_truck_inventory:addInventoryItem', function(type, model, pl
     {
       ['@plate'] = plate,
       ['@qty'] = count,
-      ['@item'] = itemname,
+      ['@item'] = item,
       ['@name'] = name,
+      ['@itemt'] = itemType,
       ['@owned'] = ownedV,    
     },  
   function(result)
     if itemType == 'item_standard' then
-    local label = xPlayer.getInventoryItem(itemName).count
+    local label = xPlayer.getInventoryItem(item).count
    
     if playerItemCount <= amount then
-       xPlayer.removeInventoryItem(itemName, amount)
+       xPlayer.removeInventoryItem(item, amount)
     else
       ESX.ShowNotification('Invalid quantity')
     end
   end
 
   if itemType == 'item_account' then
-    xPlayer.removeAccountMoney(itemName, amount)
+    xPlayer.removeAccountMoney(item, amount)
   end
 
   if itemType == 'item_weapon' then
-    xPlayer.removeWeapon(itemName)
+    xPlayer.removeWeapon(item)
   end
 
  end)
