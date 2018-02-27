@@ -129,4 +129,5 @@ AddEventHandler('esx_truck_inventory:addInventoryItem', function(type, model, pl
     xPlayer.removeWeapon(itemName)
   end
 
+ end)
 end)
