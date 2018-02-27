@@ -127,6 +127,9 @@ AddEventHandler('esx_truck_inventory:getInventoryLoaded', function(inventory)
 				    })
 				end
 			end
+
+---edit here
+
 			ESX.UI.Menu.Open(
 			  'default', GetCurrentResourceName(), 'inventory_player',
 			  {
