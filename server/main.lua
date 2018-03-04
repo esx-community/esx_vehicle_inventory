@@ -95,7 +95,7 @@ AddEventHandler('esx_truck_inventory:removeInventoryItem', function(plate, item,
      if itemType == 'item_weapon' then
      xPlayer.addWeapon(item)
      end
-    end)
+   end
 end)
 
 RegisterServerEvent('esx_truck_inventory:addInventoryItem')
