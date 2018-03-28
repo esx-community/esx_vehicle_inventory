@@ -8,6 +8,8 @@ server_scripts {
   '@async/async.lua',
   '@mysql-async/lib/MySQL.lua',
   'config.lua',
+  'server/classes/c_truck.lua',
+  'server/truck.lua',
   'server/main.lua'
 }
 
