@@ -12,7 +12,17 @@ AddEventHandler('onMySQLReady', function ()
 	MySQL.Async.execute( 'DELETE FROM `truck_inventory2` WHERE `owned` = 0', {})
 end)
 
-
+function getItemWeight(item)
+  local weight = 0
+  local itemWeight = 0
+    if item ~= nil then
+      itemWeight = Config.DefaultWeight
+      if arrayWeight[item] ~= nil then
+        itemWeight = arrayWeight[item]
+      end
+    end
+  return itemWeight
+end
 
 function getInventoryWeight(inventory)
   local weight = 0
@@ -186,7 +196,7 @@ AddEventHandler('esx_truck:putItem', function(plate, type, item, count,max)
             count = count
           })
         end
-        if getInventoryWeight(coffre)>max then
+        if (getTotalInventoryWeight(plate)+(getItemWeight(item)*count))>max then
             TriggerClientEvent('esx:showNotification', _source, 'plus de place dans le ~r~ coffre')
         else
           store.set('coffre', coffre)
@@ -207,7 +217,7 @@ AddEventHandler('esx_truck:putItem', function(plate, type, item, count,max)
 
     if (playerAccountMoney >= count and count > 0) then
 
-      xPlayer.removeAccountMoney(item, count)
+
       TriggerEvent('esx_truck:getSharedDataStore', plate , function(store)
 
         local blackMoney = (store.get('black_money') or nil)
@@ -217,7 +227,13 @@ AddEventHandler('esx_truck:putItem', function(plate, type, item, count,max)
           blackMoney = {}
           table.insert(blackMoney,{amount=count})
         end
-        store.set('black_money', blackMoney)
+
+        if (getTotalInventoryWeight(plate)+blackMoney[1].amount/10) > max then
+          TriggerClientEvent('esx:showNotification', _source, 'plus de place dans le ~r~ coffre')
+        else
+          xPlayer.removeAccountMoney(item, count)
+          store.set('black_money', blackMoney)
+        end
       end)
 
     else
@@ -240,11 +256,12 @@ AddEventHandler('esx_truck:putItem', function(plate, type, item, count,max)
         name = item,
         ammo = count
       })
-
-      store.set('weapons', storeWeapons)
-
-      xPlayer.removeWeapon(item)
-
+      if (getTotalInventoryWeight(plate)+(getItemWeight(item)))>max then
+          TriggerClientEvent('esx:showNotification', _source, 'plus de place dans le ~r~ coffre')
+      else
+        store.set('weapons', storeWeapons)
+        xPlayer.removeWeapon(item)
+      end
     end)
 
   end
@@ -263,3 +280,4 @@ ESX.RegisterServerCallback('esx_truck:getPlayerInventory', function(source, cb)
   })
 
 end)
+
