@@ -104,11 +104,11 @@ Citizen.CreateThread(function()
 
 	              TriggerServerEvent("esx_truck_inventory:getInventory", GetVehicleNumberPlateText(vehFront))
 	            else
-	          	   ESX.ShowNotification('Ce coffre est ~r~fermé')
+	          	   ESX.ShowNotification(_U('coffre_ferme'))
               end
             end
         else
-        	ESX.ShowNotification('Pas de ~r~véhicule~w~ à proximité')
+        	ESX.ShowNotification(_U('pas_vehicule'))
           end
       lastOpen = true
       GUI.Time  = GetGameTimer()
@@ -132,7 +132,7 @@ AddEventHandler('esx_truck_inventory:getInventoryLoaded', function(inventory,wei
   TriggerServerEvent("esx_truck_inventory:getOwnedVehicule")
 
 	table.insert(elements, {
-      label     = 'Déposer',
+      label     = _U('deposer'),
       count     = 0,
       value     = 'deposit',
     })
@@ -153,7 +153,7 @@ AddEventHandler('esx_truck_inventory:getInventoryLoaded', function(inventory,wei
 	ESX.UI.Menu.Open(
 	  'default', GetCurrentResourceName(), 'inventory_deposit',
 	  {
-	    title    = 'Contenu du coffre',
+	    title    = _U('contenu_coffre'),
 	    align    = 'bottom-right',
 	    elements = elements,
 	  },
@@ -175,14 +175,14 @@ AddEventHandler('esx_truck_inventory:getInventoryLoaded', function(inventory,wei
 			ESX.UI.Menu.Open(
 			  'default', GetCurrentResourceName(), 'inventory_player',
 			  {
-			    title    = 'Contenu de l\'inventaire',
+			    title    = _U('contenu_inventaire'),
 			    align    = 'bottom-right',
 			    elements = elem,
 			  },function(data3, menu3)
 				ESX.UI.Menu.Open(
 				  'dialog', GetCurrentResourceName(), 'inventory_item_count_give',
 				  {
-				    title = 'quantité'
+				    title = _U('quantite')
 				  },
 				  function(data4, menu4)
             local quantity = tonumber(data4.value)
@@ -248,12 +248,12 @@ AddEventHandler('esx_truck_inventory:getInventoryLoaded', function(inventory,wei
               --  VehicleMaxSpeed(closecar,totalweight,Config.VehicleLimit[GetVehicleClass(closecar)])
 
   				      TriggerServerEvent('esx_truck_inventory:addInventoryItem', GetVehicleClass(closecar), GetDisplayNameFromVehicleModel(GetEntityModel(closecar)), GetVehicleNumberPlateText(vehFront), data3.current.value, quantity, data3.current.name,ownedV)
-                ESX.ShowNotification('Poid du coffre : ~g~'.. Kgweight .. ' Kg / '..MaxVh..' Kg')
+                ESX.ShowNotification(_U('poid_coffre')..'~g~'.. Kgweight .. ' Kg / '..MaxVh..' Kg')
               else
-                ESX.ShowNotification('Vous avez atteint la limite des ~r~ '..MaxVh..' Kg')
+                ESX.ShowNotification(_U('atteint_limite')..'~r~ '..MaxVh..' Kg')
               end
 				    else
-			      		ESX.ShowNotification('~r~ Quantité invalide')
+			      		ESX.ShowNotification(_U('quantite_invalide'))
 				    end
 
 				    ESX.UI.Menu.CloseAll()
@@ -270,7 +270,7 @@ AddEventHandler('esx_truck_inventory:getInventoryLoaded', function(inventory,wei
 			ESX.UI.Menu.Open(
 			  'dialog', GetCurrentResourceName(), 'inventory_item_count_give',
 			  {
-			    title = 'quantité'
+			    title = _U('quantite')
 			  },
 			  function(data2, menu2)
 
@@ -304,10 +304,10 @@ AddEventHandler('esx_truck_inventory:getInventoryLoaded', function(inventory,wei
                TriggerServerEvent('esx_truck_inventory:removeInventoryItem', GetVehicleNumberPlateText(vehFront), data.current.value, quantity)
 
             else
-              ESX.ShowNotification('~r~ Tu en porte trops')
+              ESX.ShowNotification(_U('porte_trops'))
             end
 			    else
-			      ESX.ShowNotification('~r~ Quantité invalide')
+			      ESX.ShowNotification(_U('quantite_invalide'))
 			    end
 
 			    ESX.UI.Menu.CloseAll()
