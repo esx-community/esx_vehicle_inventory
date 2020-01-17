@@ -1,23 +1,8 @@
-local Keys = {
-  ["ESC"] = 322, ["F1"] = 288, ["F2"] = 289, ["F3"] = 170, ["F5"] = 166, ["F6"] = 167, ["F7"] = 168, ["F8"] = 169, ["F9"] = 56, ["F10"] = 57,
-  ["~"] = 243, ["1"] = 157, ["2"] = 158, ["3"] = 160, ["4"] = 164, ["5"] = 165, ["6"] = 159, ["7"] = 161, ["8"] = 162, ["9"] = 163, ["-"] = 84, ["="] = 83, ["BACKSPACE"] = 177,
-  ["TAB"] = 37, ["Q"] = 44, ["W"] = 32, ["E"] = 38, ["R"] = 45, ["T"] = 245, ["Y"] = 246, ["U"] = 303, ["P"] = 199, ["["] = 39, ["]"] = 40, ["ENTER"] = 18,
-  ["CAPS"] = 137, ["A"] = 34, ["S"] = 8, ["D"] = 9, ["F"] = 23, ["G"] = 47, ["H"] = 74, ["K"] = 311, ["L"] = 182,
-  ["LEFTSHIFT"] = 21, ["Z"] = 20, ["X"] = 73, ["C"] = 26, ["V"] = 0, ["B"] = 29, ["N"] = 249, ["M"] = 244, [","] = 82, ["."] = 81,
-  ["LEFTCTRL"] = 36, ["LEFTALT"] = 19, ["SPACE"] = 22, ["RIGHTCTRL"] = 70,
-  ["HOME"] = 213, ["PAGEUP"] = 10, ["PAGEDOWN"] = 11, ["DELETE"] = 178,
-  ["LEFT"] = 174, ["RIGHT"] = 175, ["TOP"] = 27, ["DOWN"] = 173,
-  ["NENTER"] = 201, ["N4"] = 108, ["N5"] = 60, ["N6"] = 107, ["N+"] = 96, ["N-"] = 97, ["N7"] = 117, ["N8"] = 61, ["N9"] = 118
-}
-
-
-ESX                           = nil
-local GUI      = {}
-local PlayerData                = {}
-local lastVehicle = nil
+ESX = nil
+local GUI, vehiclePlate, PlayerData = {}, {}, {}
+local lastVehicle
 local lastOpen = false
-GUI.Time                      = 0
-local vehiclePlate = {}
+GUI.Time = 0
 local arrayWeight = Config.localWeight
 
 function getItemyWeight(item)
@@ -32,7 +17,6 @@ function getItemyWeight(item)
 	end
   return itemWeight
 end
-
 
 Citizen.CreateThread(function()
   while ESX == nil do
@@ -84,7 +68,7 @@ Citizen.CreateThread(function()
 
     Wait(0)
 
-    if IsControlPressed(0, Keys["L"]) and (GetGameTimer() - GUI.Time) > 150 then
+    if IsControlPressed(0, 182) and (GetGameTimer() - GUI.Time) > 150 then
         local vehFront = VehicleInFront()
 	    local x,y,z = table.unpack(GetEntityCoords(GetPlayerPed(-1),true))
 	    local closecar = GetClosestVehicle(x, y, z, 4.0, 0, 71)
@@ -112,7 +96,7 @@ Citizen.CreateThread(function()
           end
       lastOpen = true
       GUI.Time  = GetGameTimer()
-    elseif lastOpen and IsControlPressed(0, Keys["BACKSPACE"]) and (GetGameTimer() - GUI.Time) > 150 then
+    elseif lastOpen and IsControlPressed(0, 177) and (GetGameTimer() - GUI.Time) > 150 then
       lastOpen = false
       ESX.UI.Menu.CloseAll()
       if lastVehicle > 0 then
@@ -168,23 +152,18 @@ AddEventHandler('esx_truck_inventory:getInventoryLoaded', function(inventory,wei
 				      count     = PlayerData.inventory[i].count,
 				      value     = PlayerData.inventory[i].name,
 				      name     = PlayerData.inventory[i].label,
-              limit     = PlayerData.inventory[i].limit,
+				      limit     = PlayerData.inventory[i].limit,
 				    })
 				end
 			end
-			ESX.UI.Menu.Open(
-			  'default', GetCurrentResourceName(), 'inventory_player',
-			  {
+			ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'inventory_player', {
 			    title    = 'Contenu de l\'inventaire',
 			    align    = 'bottom-right',
 			    elements = elem,
-			  },function(data3, menu3)
-				ESX.UI.Menu.Open(
-				  'dialog', GetCurrentResourceName(), 'inventory_item_count_give',
-				  {
+			  }, function(data3, menu3)
+				ESX.UI.Menu.Open('dialog', GetCurrentResourceName(), 'inventory_item_count_give', {
 				    title = 'quantité'
-				  },
-				  function(data4, menu4)
+				  }, function(data4, menu4)
             local quantity = tonumber(data4.value)
             local Itemweight =tonumber(getItemyWeight(data3.current.value)) * quantity
             local totalweight = tonumber(weight) + Itemweight
@@ -197,8 +176,6 @@ AddEventHandler('esx_truck_inventory:getInventoryLoaded', function(inventory,wei
             else
               max = false
             end
-
-
 
             --test
 --[[
@@ -257,22 +234,15 @@ AddEventHandler('esx_truck_inventory:getInventoryLoaded', function(inventory,wei
 				    end
 
 				    ESX.UI.Menu.CloseAll()
-
-
-				  end,
-				  function(data4, menu4)
+				  end, function(data4, menu4)
 		            SetVehicleDoorShut(vehFrontBack, 5, false)
 				    ESX.UI.Menu.CloseAll()
-				  end
-				)
+				  end)
 			end)
 	  	else
-			ESX.UI.Menu.Open(
-			  'dialog', GetCurrentResourceName(), 'inventory_item_count_give',
-			  {
+			ESX.UI.Menu.Open('dialog', GetCurrentResourceName(), 'inventory_item_count_give', {
 			    title = 'quantité'
-			  },
-			  function(data2, menu2)
+			  }, function(data2, menu2)
 
 			    local quantity = tonumber(data2.value)
           PlayerData = ESX.GetPlayerData()
@@ -281,8 +251,6 @@ AddEventHandler('esx_truck_inventory:getInventoryLoaded', function(inventory,wei
           --test
           local Itemweight =tonumber(getItemyWeight(data.current.value)) * quantity
           local poid = weight - Itemweight
-
-
 
           for i=1, #PlayerData.inventory, 1 do
 
@@ -296,7 +264,6 @@ AddEventHandler('esx_truck_inventory:getInventoryLoaded', function(inventory,wei
           end
 
           --fin test
-
 
 			    if quantity > 0 and quantity <= tonumber(data.current.count) and vehFront > 0 then
             if not max then
@@ -320,12 +287,10 @@ AddEventHandler('esx_truck_inventory:getInventoryLoaded', function(inventory,wei
 	            else
 	              SetVehicleDoorShut(vehFrontBack, 5, false)
 	            end
-			  end,
-			  function(data2, menu2)
+			  end, function(data2, menu2)
 	            SetVehicleDoorShut(vehFrontBack, 5, false)
 			    ESX.UI.Menu.CloseAll()
-			  end
-			)
+			  end)
 	  	end
 	  end)
 end)
