@@ -93,4 +93,4 @@ AddEventHandler('esx_truck_inventory:addInventoryItem', function(type, model, pl
       xPlayer.removeInventoryItem(item, count)
     end)
 end)
-end)
+
